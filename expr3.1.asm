@@ -4,9 +4,19 @@ stack       ends
 
 data        segment     para
 tmp1        db          30 dup(?)
-string1     db          'guohongyu$'
-string1_len equ         $ - string1
+string1_1     db          'guohongyu'
+string1_1_len equ         $ - string1_1
 tmp2        db          60 dup(?)
+
+tmp3        db          30 dup(?)
+string1_2     db          'guohongyu'
+string1_2_len equ         $ - string1_2
+tmp4        db          30 dup(?)
+
+tmp5        db          30 dup(?)
+string1_3     db          'guohongyu'
+string1_3_len equ         $ - string1_3
+tmp6        db          30 dup(?)
 
 data        ends
 
@@ -17,22 +27,29 @@ main        proc        far
             mov         ax, data
             mov         ds, ax
             mov         es, ax
-
-            mov         si, offset string1
-            mov         cx, string1_len
             
             ; not overlay
+            mov         si, offset string1_1
+            mov         cx, string1_1_len
             mov         di, offset tmp2
             add         di, 30h
+            mov         dx, offset string1_1
             call        show
 
             ; string2 before string1
-            mov         di, offset string1
+            mov         si, offset string1_2
+            mov         cx, string1_2_len
+            mov         di, offset string1_2
             sub         di, 5
+            mov         dx, offset string1_2
             call        show
 
-            mov       di, offset string1
+            ; string2 after string1
+            mov         si, offset string1_3
+            mov         cx, string1_3_len
+            mov       di, offset string1_3
             add       di, 2
+            mov         dx, offset string1_3
             call      show
 
 
@@ -40,15 +57,15 @@ main        proc        far
 
 
 show        proc
-            mov         dx, offset string1
-            call        dispstring
+            push        dx
+            call        dispnumchar
             call        dispspace
             call        Memmove
-            mov         dx, offset string1
-            call        dispstring
+            pop         dx
+            call        dispnumchar
             call        dispspace
             mov         dx, di
-            call        dispstring
+            call        dispnumchar
             call        dispspace
             call        dispenter            
             ret
@@ -98,6 +115,27 @@ dispenter   proc  ; char should in dl
             pop     ax
             ret
 dispenter   endp
+
+dispnumchar proc  ; string first offset address should in dx
+                  ; string len should in cx
+            push cx
+            push ax
+            push dx
+            push si
+
+            mov  si, dx
+            mov  ah, 2
+dispnumchar_l1:
+            mov  dl, [si]
+            int  21h
+            inc  si
+            loop dispnumchar_l1
+            pop si
+            pop dx
+            pop ax
+            pop cx
+            ret
+dispnumchar endp
 
 exit:       mov         ax, 4c00h
             int         21h

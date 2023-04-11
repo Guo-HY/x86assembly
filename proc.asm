@@ -14,6 +14,28 @@ dispstring  proc  ; string first offset address should in dx
             pop   ax
             ret
 dispstring  endp
+
+dispnumchar proc  ; string first offset address should in dx
+                  ; string len should in cx
+            push cx
+            push ax
+            push dx
+            push si
+
+            mov  si, dx
+            mov  ah, 2
+dispnumchar_l1:
+            mov  dl, [si]
+            int  21h
+            inc  si
+            loop dispnumchar_l1
+            pop si
+            pop dx
+            pop ax
+            pop cx
+            ret
+dispnumchar endp
+
             
 disp_dec_value  proc    ; ax = value that want to show in dec
                         ; without leading zero
